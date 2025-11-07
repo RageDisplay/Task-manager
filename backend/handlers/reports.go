@@ -32,10 +32,10 @@ func (h *ReportHandler) ExportMyTasks(c *gin.Context) {
 	defer rows.Close()
 
 	f := excelize.NewFile()
-	f.SetSheetName("Sheet1", "My Tasks")
+	f.SetSheetName("Sheet1", "Мои задачи")
 
 	// Заголовки
-	headers := []string{"Title", "Description", "Progress (%)", "Hours per Week", "Load per Month (%)", "Created At"}
+	headers := []string{"Название", "Описание", "Прогресс (%)", "Часов потрачено", "Нагрузка с задачи на месяц (%)", "Создана"}
 	for i, header := range headers {
 		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
 		f.SetCellValue("My Tasks", cell, header)
@@ -58,7 +58,7 @@ func (h *ReportHandler) ExportMyTasks(c *gin.Context) {
 		data := []interface{}{title, description, progress, hoursPerWeek, loadPerMonth, createdAt.Format("2006-01-02")}
 		for i, value := range data {
 			cell, _ := excelize.CoordinatesToCellName(i+1, rowIndex)
-			f.SetCellValue("My Tasks", cell, value)
+			f.SetCellValue("Мои задачи", cell, value)
 		}
 		rowIndex++
 	}
@@ -72,12 +72,7 @@ func (h *ReportHandler) ExportDepartmentTasks(c *gin.Context) {
 	userDepartment := c.GetString("userDepartment")
 
 	rows, err := h.db.Query(`
-        SELECT t.title, t.description, t.progress, t.hours_per_week, t.load_per_month, 
-               t.created_at, u.username
-        FROM tasks t 
-        JOIN users u ON t.user_id = u.id 
-        WHERE u.department = ?
-    `, userDepartment)
+        SELECT t.title, t.description, t.progress, t.hours_per_week, t.load_per_month, t.created_at, u.username FROM tasks t JOIN users u ON t.user_id = u.id WHERE u.department = ?`, userDepartment)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -86,12 +81,12 @@ func (h *ReportHandler) ExportDepartmentTasks(c *gin.Context) {
 	defer rows.Close()
 
 	f := excelize.NewFile()
-	f.SetSheetName("Sheet1", "Department Tasks")
+	f.SetSheetName("Sheet1", "Задания отдела")
 
-	headers := []string{"Title", "Description", "Progress (%)", "Hours per Week", "Load per Month (%)", "Created At", "User"}
+	headers := []string{"Название", "Описание задачи", "Прогресс выполнения (%)", "Часов потрачено", "Нагрузка от задачи на месяц (%)", "Создана: ", "Сотрудник"}
 	for i, header := range headers {
 		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
-		f.SetCellValue("Department Tasks", cell, header)
+		f.SetCellValue("Задания отдела", cell, header)
 	}
 
 	rowIndex := 2
@@ -111,7 +106,7 @@ func (h *ReportHandler) ExportDepartmentTasks(c *gin.Context) {
 			createdAt.Format("2006-01-02"), username}
 		for i, value := range data {
 			cell, _ := excelize.CoordinatesToCellName(i+1, rowIndex)
-			f.SetCellValue("Department Tasks", cell, value)
+			f.SetCellValue("Задания отдела", cell, value)
 		}
 		rowIndex++
 	}
@@ -123,11 +118,7 @@ func (h *ReportHandler) ExportDepartmentTasks(c *gin.Context) {
 
 func (h *ReportHandler) ExportAllTasks(c *gin.Context) {
 	rows, err := h.db.Query(`
-        SELECT t.title, t.description, t.progress, t.hours_per_week, t.load_per_month, 
-               t.created_at, u.username, u.department
-        FROM tasks t 
-        JOIN users u ON t.user_id = u.id
-    `)
+        SELECT t.title, t.description, t.progress, t.hours_per_week, t.load_per_month, t.created_at, u.username, u.department FROM tasks t JOIN users u ON t.user_id = u.id`)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -136,13 +127,12 @@ func (h *ReportHandler) ExportAllTasks(c *gin.Context) {
 	defer rows.Close()
 
 	f := excelize.NewFile()
-	f.SetSheetName("Sheet1", "All Tasks")
+	f.SetSheetName("Sheet1", "Все задачи")
 
-	headers := []string{"Title", "Description", "Progress (%)", "Hours per Week", "Load per Month (%)",
-		"Created At", "User", "Department"}
+	headers := []string{"Название", "Описание задачи", "Прогресс выполнения (%)", "Часов потрачено", "Нагрузка от задачи на месяц (%)", "Создано", "Сотрудник", "Отдел"}
 	for i, header := range headers {
 		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
-		f.SetCellValue("All Tasks", cell, header)
+		f.SetCellValue("Все задачи", cell, header)
 	}
 
 	rowIndex := 2
@@ -163,7 +153,7 @@ func (h *ReportHandler) ExportAllTasks(c *gin.Context) {
 			createdAt.Format("2006-01-02"), username, department}
 		for i, value := range data {
 			cell, _ := excelize.CoordinatesToCellName(i+1, rowIndex)
-			f.SetCellValue("All Tasks", cell, value)
+			f.SetCellValue("Все задачи", cell, value)
 		}
 		rowIndex++
 	}
