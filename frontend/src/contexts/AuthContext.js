@@ -6,6 +6,15 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
+// Функция для получения базового URL API
+export const getApiBaseUrl = () => {
+  // В продакшене используем относительный путь, в разработке - localhost
+  if (process.env.NODE_ENV === 'production') {
+    return '';
+  }
+  return 'http://localhost:8080';
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

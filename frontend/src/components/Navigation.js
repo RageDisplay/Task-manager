@@ -31,10 +31,15 @@ const Navigation = () => {
                 Reports
               </Link>
               {user.role === 'admin' && (
-                <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
+    <>
+              <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
                   User Management
-                </Link>
-              )}
+              </Link>
+              <Link to="/backup" className={location.pathname === '/backup' ? 'active' : ''}>
+                  Backup
+              </Link>
+    </>
+          )}
               <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
           ) : (

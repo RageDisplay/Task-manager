@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,7 +20,7 @@ const Login = () => {
 
     try {
       const endpoint = isLogin ? '/api/login' : '/api/register';
-      const response = await axios.post(`http://localhost:8080${endpoint}`, formData);
+      const response = await api.post(endpoint, formData); // Используем api вместо axios
       
       if (response.data.token) {
         login(response.data.user, response.data.token);

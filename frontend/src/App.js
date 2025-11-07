@@ -7,6 +7,7 @@ import TaskManager from './components/TaskManager';
 import UserManagement from './components/UserManagement';
 import Reports from './components/Reports';
 import Navigation from './components/Navigation';
+import BackupManager from './components/BackupManager';
 import './App.css';
 
 function ProtectedRoute({ children, requiredRole }) {
@@ -48,6 +49,11 @@ function App() {
               <Route path="/reports" element={
                 <ProtectedRoute>
                   <Reports />
+                </ProtectedRoute>
+              } />
+              <Route path="/backup" element={
+                <ProtectedRoute requiredRole="admin">
+                  <BackupManager />
                 </ProtectedRoute>
               } />
               <Route path="/" element={<Navigate to="/dashboard" />} />

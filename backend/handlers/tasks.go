@@ -60,22 +60,20 @@ func (h *TaskHandler) GetTasks(c *gin.Context) {
 	tasks := []models.Task{}
 	for rows.Next() {
 		var task models.Task
-		var tempDepartment sql.NullString
+		var department sql.NullString
 
 		err := rows.Scan(
 			&task.ID, &task.Title, &task.Description, &task.Progress,
 			&task.HoursPerWeek, &task.LoadPerMonth, &task.UserID,
-			&task.CreatedAt, &task.UpdatedAt, &task.Username, &tempDepartment,
+			&task.CreatedAt, &task.UpdatedAt, &task.Username, &department,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		if tempDepartment.Valid {
-			task.Department = tempDepartment.String
-		} else {
-			task.Department = ""
+		if department.Valid {
+			task.Department = department.String
 		}
 
 		tasks = append(tasks, task)
@@ -93,20 +91,6 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 		return
 	}
 
-	// Валидация данных
-	if task.Title == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Title is required"})
-		return
-	}
-	if task.Progress < 0 || task.Progress > 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Progress must be between 0 and 100"})
-		return
-	}
-	if task.LoadPerMonth < 0 || task.LoadPerMonth > 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Load per month must be between 0 and 100"})
-		return
-	}
-
 	result, err := h.db.Exec(`
         INSERT INTO tasks (title, description, progress, hours_per_week, load_per_month, user_id)
         VALUES (?, ?, ?, ?, ?, ?)
@@ -119,44 +103,11 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 
 	id, _ := result.LastInsertId()
 	task.ID = int(id)
-
-	// Получаем созданную задачу с информацией о пользователе
-	var createdTask models.Task
-	var username string
-	var department sql.NullString
-	err = h.db.QueryRow(`
-        SELECT t.*, u.username, u.department 
-        FROM tasks t 
-        JOIN users u ON t.user_id = u.id 
-        WHERE t.id = ?
-    `, task.ID).Scan(
-		&createdTask.ID, &createdTask.Title, &createdTask.Description, &createdTask.Progress,
-		&createdTask.HoursPerWeek, &createdTask.LoadPerMonth, &createdTask.UserID,
-		&createdTask.CreatedAt, &createdTask.UpdatedAt, &username, &department,
-	)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	createdTask.Username = username
-	if department.Valid {
-		createdTask.Department = department.String
-	} else {
-		createdTask.Department = ""
-	}
-
-	c.JSON(http.StatusCreated, createdTask)
+	c.JSON(http.StatusCreated, task)
 }
 
 func (h *TaskHandler) UpdateTask(c *gin.Context) {
-	taskID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid task ID"})
-		return
-	}
-
+	taskID, _ := strconv.Atoi(c.Param("id"))
 	userID := c.GetInt("userID")
 	userRole := c.GetString("userRole")
 
@@ -164,15 +115,7 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	if userRole == "user" {
 		var taskUserID int
 		err := h.db.QueryRow("SELECT user_id FROM tasks WHERE id = ?", taskID).Scan(&taskUserID)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
-			} else {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			}
-			return
-		}
-		if taskUserID != userID {
+		if err != nil || taskUserID != userID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
 			return
 		}
@@ -184,21 +127,7 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	// Валидация данных
-	if task.Title == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Title is required"})
-		return
-	}
-	if task.Progress < 0 || task.Progress > 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Progress must be between 0 and 100"})
-		return
-	}
-	if task.LoadPerMonth < 0 || task.LoadPerMonth > 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Load per month must be between 0 and 100"})
-		return
-	}
-
-	result, err := h.db.Exec(`
+	_, err := h.db.Exec(`
         UPDATE tasks 
         SET title = ?, description = ?, progress = ?, hours_per_week = ?, load_per_month = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
@@ -209,49 +138,11 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
-		return
-	}
-
-	// Получаем обновленную задачу
-	var updatedTask models.Task
-	var username string
-	var department sql.NullString
-	err = h.db.QueryRow(`
-        SELECT t.*, u.username, u.department 
-        FROM tasks t 
-        JOIN users u ON t.user_id = u.id 
-        WHERE t.id = ?
-    `, taskID).Scan(
-		&updatedTask.ID, &updatedTask.Title, &updatedTask.Description, &updatedTask.Progress,
-		&updatedTask.HoursPerWeek, &updatedTask.LoadPerMonth, &updatedTask.UserID,
-		&updatedTask.CreatedAt, &updatedTask.UpdatedAt, &username, &department,
-	)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	updatedTask.Username = username
-	if department.Valid {
-		updatedTask.Department = department.String
-	} else {
-		updatedTask.Department = ""
-	}
-
-	c.JSON(http.StatusOK, updatedTask)
+	c.JSON(http.StatusOK, gin.H{"message": "Task updated successfully"})
 }
 
 func (h *TaskHandler) DeleteTask(c *gin.Context) {
-	taskID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid task ID"})
-		return
-	}
-
+	taskID, _ := strconv.Atoi(c.Param("id"))
 	userID := c.GetInt("userID")
 	userRole := c.GetString("userRole")
 
@@ -259,29 +150,15 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 	if userRole == "user" {
 		var taskUserID int
 		err := h.db.QueryRow("SELECT user_id FROM tasks WHERE id = ?", taskID).Scan(&taskUserID)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
-			} else {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			}
-			return
-		}
-		if taskUserID != userID {
+		if err != nil || taskUserID != userID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
 			return
 		}
 	}
 
-	result, err := h.db.Exec("DELETE FROM tasks WHERE id = ?", taskID)
+	_, err := h.db.Exec("DELETE FROM tasks WHERE id = ?", taskID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 		return
 	}
 

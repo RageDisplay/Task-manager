@@ -1,17 +1,15 @@
 import React from 'react';
-import axios from 'axios';
+import api from '../utils/api'; // Импортируем api
 import { useAuth } from '../contexts/AuthContext';
 
 const Reports = () => {
-  const { user } = useAuth();
+    const { user } = useAuth();
 
-  const downloadReport = async (type) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/reports/${type}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: 'blob'
-      });
+    const downloadReport = async (type) => {
+        try {
+            const response = await api.get(`/api/reports/${type}`, { // Используем api
+                responseType: 'blob'
+            });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -37,10 +35,10 @@ const Reports = () => {
       link.click();
       link.remove();
     } catch (error) {
-      console.error('Error downloading report:', error);
-      alert('Error downloading report: ' + (error.response?.data?.error || error.message));
-    }
-  };
+            console.error('Error downloading report:', error);
+            alert('Error downloading report: ' + (error.response?.data?.error || error.message));
+        }
+    };
 
   return (
     <div className="reports-section">

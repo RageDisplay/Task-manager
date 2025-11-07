@@ -2,12 +2,24 @@ package database
 
 import (
 	"database/sql"
+	"log"
+	"os"
+	"path/filepath"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func InitDB() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "./tasks.db")
+	// Создаем директорию для данных, если её нет
+	dataDir := "./data"
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		return nil, err
+	}
+
+	dbPath := filepath.Join(dataDir, "tasks.db")
+	log.Printf("Initializing database at: %s", dbPath)
+
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return nil, err
 	}
@@ -51,5 +63,6 @@ func InitDB() (*sql.DB, error) {
 	db.Exec(`INSERT OR IGNORE INTO users (username, password_hash, role, department) 
              VALUES (?, ?, ?, ?)`, "admin", hashedPassword, "admin", "Administration")
 
+	log.Println("Database initialized successfully")
 	return db, nil
 }

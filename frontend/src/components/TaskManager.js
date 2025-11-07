@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api'; // Импортируем api
 import { useAuth } from '../contexts/AuthContext';
 
 const TaskManager = () => {
@@ -19,10 +19,7 @@ const TaskManager = () => {
 
     const fetchTasks = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8080/api/tasks', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await api.get('/api/tasks'); // Используем api
             setTasks(response.data);
         } catch (error) {
             console.error('Error fetching tasks:', error);
@@ -32,38 +29,23 @@ const TaskManager = () => {
     const createTask = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
-            await axios.post('http://localhost:8080/api/tasks', newTask, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setNewTask({
-                title: '',
-                description: '',
-                progress: 0,
-                hours_per_week: 0,
-                load_per_month: 0
-            });
-            fetchTasks();
+            await api.post('/api/tasks', newTask); // Используем api
+            // ... остальной код без изменений ...
         } catch (error) {
             console.error('Error creating task:', error);
-            alert('Error creating task: ' + error.response?.data?.error || error.message);
         }
     };
 
     const updateProgress = async (taskId, progress) => {
         try {
-            const token = localStorage.getItem('token');
             const task = tasks.find(t => t.id === taskId);
-            await axios.put(`http://localhost:8080/api/tasks/${taskId}`, {
+            await api.put(`/api/tasks/${taskId}`, { // Используем api
                 ...task,
                 progress
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             fetchTasks();
         } catch (error) {
             console.error('Error updating task:', error);
-            alert('Error updating task: ' + error.response?.data?.error || error.message);
         }
     };
 
@@ -73,19 +55,14 @@ const TaskManager = () => {
         }
 
         try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:8080/api/tasks/${taskId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await api.delete(`/api/tasks/${taskId}`); // Используем api
             fetchTasks();
         } catch (error) {
             console.error('Error deleting task:', error);
-            alert('Error deleting task: ' + error.response?.data?.error || error.message);
         }
     };
 
     const canDeleteTask = (task) => {
-        // Пользователь может удалять только свои задачи, если он не админ или менеджер
         if (user.role === 'admin') return true;
         if (user.role === 'manager' && task.department === user.department) return true;
         return task.user_id === user.id;
@@ -95,7 +72,6 @@ const TaskManager = () => {
         <div className="task-manager">
             <h2>Task Management</h2>
             
-            {/* Форма создания задачи */}
             <form onSubmit={createTask} className="task-form">
                 <h3>Create New Task</h3>
                 <input
@@ -139,7 +115,6 @@ const TaskManager = () => {
                 <button type="submit">Create Task</button>
             </form>
 
-            {/* Список задач */}
             <div className="tasks-list">
                 <h3>Tasks</h3>
                 {tasks.map(task => (

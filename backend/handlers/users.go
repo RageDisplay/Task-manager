@@ -16,14 +16,6 @@ func NewUserHandler(db *sql.DB) *UserHandler {
 	return &UserHandler{db: db}
 }
 
-type UserResponse struct {
-	ID         int    `json:"id"`
-	Username   string `json:"username"`
-	Role       string `json:"role"`
-	Department string `json:"department"`
-	CreatedAt  string `json:"created_at"`
-}
-
 func (h *UserHandler) GetUsers(c *gin.Context) {
 	userRole := c.GetString("userRole")
 	userDepartment := c.GetString("userDepartment")
@@ -46,32 +38,30 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 	}
 	defer rows.Close()
 
+	type UserResponse struct {
+		ID         int    `json:"id"`
+		Username   string `json:"username"`
+		Role       string `json:"role"`
+		Department string `json:"department"`
+		CreatedAt  string `json:"created_at"`
+	}
+
 	users := []UserResponse{}
 	for rows.Next() {
-		var id int
-		var username, role string
+		var user UserResponse
 		var department sql.NullString
-		var createdAt string
 
-		err := rows.Scan(&id, &username, &role, &department, &createdAt)
+		err := rows.Scan(&user.ID, &user.Username, &user.Role, &department, &user.CreatedAt)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Преобразуем sql.NullString в string
-		departmentStr := ""
 		if department.Valid {
-			departmentStr = department.String
+			user.Department = department.String
 		}
 
-		users = append(users, UserResponse{
-			ID:         id,
-			Username:   username,
-			Role:       role,
-			Department: departmentStr,
-			CreatedAt:  createdAt,
-		})
+		users = append(users, user)
 	}
 
 	c.JSON(http.StatusOK, users)

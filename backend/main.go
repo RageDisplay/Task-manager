@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"task-management-backend/database"
 	"task-management-backend/handlers"
 	"task-management-backend/middleware"
@@ -26,11 +25,12 @@ func main() {
 
 	router := gin.Default()
 
-	// CORS middleware
+	// CORS middleware - разрешаем все хосты и методы
 	router.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "http://localhost:7000")
+		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Disposition")
+		c.Header("Access-Control-Expose-Headers", "Content-Disposition")
 		c.Header("Access-Control-Allow-Credentials", "true")
 
 		if c.Request.Method == "OPTIONS" {
@@ -43,9 +43,7 @@ func main() {
 	// Публичные маршруты
 	router.POST("/api/register", authHandler.Register)
 	router.POST("/api/login", authHandler.Login)
-	router.GET("/api/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
-	})
+
 	// Защищенные маршруты
 	api := router.Group("/api")
 	api.Use(middleware.AuthMiddleware())
