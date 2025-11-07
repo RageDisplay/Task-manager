@@ -27,11 +27,11 @@ const BackupManager = () => {
             link.remove();
             window.URL.revokeObjectURL(url);
             
-            setMessage('Backup downloaded successfully');
+            setMessage('Выгрузка бекапа завершена');
             setError('');
         } catch (error) {
-            console.error('Error downloading backup:', error);
-            setError('Error downloading backup: ' + (error.response?.data?.error || error.message));
+            console.error('Ошибка в скачивании бекапа:', error);
+            setError('Ошибка в скачивании бекапа: ' + (error.response?.data?.error || error.message));
             setMessage('');
         }
     };
@@ -39,11 +39,11 @@ const BackupManager = () => {
     const handleRestore = async (e) => {
         e.preventDefault();
         if (!restoreFile) {
-            setError('Please select a database file');
+            setError('Выберите файл бекапа');
             return;
         }
 
-        if (!window.confirm('WARNING: This will replace the current database. Are you sure you want to continue?')) {
+        if (!window.confirm('Внимание! Это перезапишет текущую конфигурацию. Вы уверены в этом?')) {
             return;
         }
 
@@ -57,13 +57,13 @@ const BackupManager = () => {
                 }
             });
 
-            setMessage(response.data.message || 'Database restored successfully.');
+            setMessage(response.data.message || 'База данных восстановлена.');
             setError('');
             setRestoreFile(null);
             document.getElementById('restore-file').value = '';
         } catch (error) {
-            console.error('Error restoring backup:', error);
-            setError('Error restoring backup: ' + (error.response?.data?.error || error.message));
+            console.error('Ошибка в восстановлении из бекапа:', error);
+            setError('Ошибка в восстановлении из бекапа: ' + (error.response?.data?.error || error.message));
             setMessage('');
         }
     };
@@ -79,23 +79,23 @@ const BackupManager = () => {
 
     return (
         <div className="backup-section">
-            <h2>Database Backup & Restore</h2>
+            <h2>Система создания и восстановления из бекапа</h2>
             
             <div className="backup-options">
                 <div className="backup-card">
-                    <h3>Download Backup</h3>
-                    <p>Create a backup of the current database.</p>
+                    <h3>Скачать файл бекапа</h3>
+                    <p>Создать бекап.</p>
                     <button 
                         className="btn btn-primary"
                         onClick={downloadBackup}
                     >
-                        Download Database Backup
+                        Скачать файл бекапа
                     </button>
                 </div>
 
                 <div className="backup-card">
-                    <h3>Restore Backup</h3>
-                    <p>Restore database from a backup file (.db format only).</p>
+                    <h3>Восстановление из бекапа</h3>
+                    <p>Восстановление из бекапа (.db формат только).</p>
                     
                     <form onSubmit={handleRestore} className="restore-form">
                         <div className="form-group">
@@ -105,7 +105,7 @@ const BackupManager = () => {
                                 accept=".db"
                                 onChange={(e) => setRestoreFile(e.target.files[0])}
                             />
-                            <small>Only .db files are allowed</small>
+                            <small>Только .db файлы допустимы</small>
                         </div>
                         
                         <button 
@@ -113,7 +113,7 @@ const BackupManager = () => {
                             className="btn btn-warning"
                             disabled={!restoreFile}
                         >
-                            Restore Database
+                            Восстановить
                         </button>
                     </form>
                 </div>

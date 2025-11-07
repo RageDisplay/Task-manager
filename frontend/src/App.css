@@ -463,3 +463,69 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input:disabled, 
+select:disabled, 
+textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.task-form:disabled {
+  opacity: 0.6;
+}
+
+/* Анимация загрузки */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+.btn-save {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+.btn-save:hover:not(:disabled) {
+    background-color: #218838 !important;
+}
+
+.btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+.btn-cancel:hover:not(:disabled) {
+    background-color: #5a6268 !important;
+}
+
+.users-table input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Подсветка строк с несохраненными изменениями */
+.users-table tr.unsaved-changes {
+    background-color: #fff3cd !important;
+}

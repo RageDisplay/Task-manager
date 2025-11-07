@@ -59,9 +59,8 @@ func InitDB() (*sql.DB, error) {
 	}
 
 	// Создание администратора по умолчанию
-	hashedPassword, _ := HashPassword("admin123")
-	db.Exec(`INSERT OR IGNORE INTO users (username, password_hash, role, department) 
-             VALUES (?, ?, ?, ?)`, "admin", hashedPassword, "admin", "Administration")
+	hashedPassword, _ := HashPassword("main12!@")
+	db.Exec(`INSERT OR IGNORE INTO users (username, password_hash, role, department) VALUES (?, ?, ?, ?)`, "admin", hashedPassword, "admin", "Administration")
 
 	log.Println("Database initialized successfully")
 	return db, nil

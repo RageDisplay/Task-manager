@@ -20,20 +20,20 @@ const Login = () => {
 
     try {
       const endpoint = isLogin ? '/api/login' : '/api/register';
-      const response = await api.post(endpoint, formData); // Используем api вместо axios
+      const response = await api.post(endpoint, formData);
       
       if (response.data.token) {
         login(response.data.user, response.data.token);
         navigate('/dashboard');
       }
     } catch (error) {
-      setError(error.response?.data?.error || 'Something went wrong');
+      setError(error.response?.data?.error || 'Что-то пошло не так.. обратитесь к администратору');
     }
   };
 
   return (
     <div className="login-container">
-      <h2>{isLogin ? 'Login' : 'Register'}</h2>
+      <h2>{isLogin ? 'Логин' : 'Регистрация'}</h2>
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
           <label>Username</label>
@@ -55,18 +55,18 @@ const Login = () => {
         </div>
         {error && <div className="error" style={{color: 'red'}}>{error}</div>}
         <button type="submit" className="btn btn-primary">
-          {isLogin ? 'Login' : 'Register'}
+          {isLogin ? 'Логин' : 'Регистрация'}
         </button>
       </form>
       <p>
-        {isLogin ? "Don't have an account? " : "Already have an account? "}
+        {isLogin ? "Нет аккаунта? " : "Уже есть аккаунт ? "}
         <button 
           type="button" 
           className="btn-link"
           onClick={() => setIsLogin(!isLogin)}
           style={{background: 'none', border: 'none', color: '#3498db', cursor: 'pointer'}}
         >
-          {isLogin ? 'Register' : 'Login'}
+          {isLogin ? 'Регистрация' : 'Логин'}
         </button>
       </p>
     </div>

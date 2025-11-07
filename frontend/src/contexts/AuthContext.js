@@ -8,7 +8,7 @@ export const useAuth = () => {
 
 // Функция для получения базового URL API
 export const getApiBaseUrl = () => {
-  // В продакшене используем относительный путь, в разработке - localhost
+  // В проде используем относительный путь, в разработке - localhost
   if (process.env.NODE_ENV === 'production') {
     return '';
   }

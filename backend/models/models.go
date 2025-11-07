@@ -10,7 +10,7 @@ type User struct {
 	Username     string         `json:"username"`
 	PasswordHash string         `json:"-"`
 	Role         string         `json:"role"`
-	Department   sql.NullString `json:"department"` // Изменено на sql.NullString
+	Department   sql.NullString `json:"department"`
 	CreatedAt    time.Time      `json:"created_at"`
 }
 

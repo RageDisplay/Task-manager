@@ -1,5 +1,5 @@
 import React from 'react';
-import api from '../utils/api'; // Импортируем api
+import api from '../utils/api'; 
 import { useAuth } from '../contexts/AuthContext';
 
 const Reports = () => {
@@ -7,7 +7,7 @@ const Reports = () => {
 
     const downloadReport = async (type) => {
         try {
-            const response = await api.get(`/api/reports/${type}`, { // Используем api
+            const response = await api.get(`/api/reports/${type}`, { 
                 responseType: 'blob'
             });
 
@@ -35,22 +35,22 @@ const Reports = () => {
       link.click();
       link.remove();
     } catch (error) {
-            console.error('Error downloading report:', error);
-            alert('Error downloading report: ' + (error.response?.data?.error || error.message));
+            console.error('Ошибка в скачивании отчёта:', error);
+            alert('Ошибка в скачивании отчёта: ' + (error.response?.data?.error || error.message));
         }
     };
 
   return (
     <div className="reports-section">
-      <h2>Reports</h2>
-      <p>Download task reports in Excel format.</p>
+      <h2>Отчёты</h2>
+      <p>Скачать отчёты в формате excel.</p>
       
       <div className="report-options">
         <button 
           className="btn btn-primary"
           onClick={() => downloadReport('my-tasks')}
         >
-          Download My Tasks
+          Скачать мои задачи
         </button>
 
         {(user.role === 'manager' || user.role === 'admin') && (
@@ -58,7 +58,7 @@ const Reports = () => {
             className="btn btn-secondary"
             onClick={() => downloadReport('department-tasks')}
           >
-            Download Department Tasks
+            Скачать задачи всего отдела
           </button>
         )}
 
@@ -67,7 +67,7 @@ const Reports = () => {
             className="btn btn-secondary"
             onClick={() => downloadReport('all-tasks')}
           >
-            Download All Tasks
+            Скачать все задачи из системы
           </button>
         )}
       </div>

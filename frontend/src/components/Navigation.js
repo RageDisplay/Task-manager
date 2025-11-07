@@ -15,35 +15,35 @@ const Navigation = () => {
     <nav className="navigation">
       <div className="nav-content">
         <div className="nav-brand">
-          Task Management System
+          Nexus TM (DEMO)
         </div>
         <div className="nav-links">
           {user ? (
             <>
-              <span className="nav-user">Hello, {user.username} ({user.role})</span>
+              <span className="nav-user">Привет, {user.username} ({user.role})</span>
               <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''}>
-                Dashboard
+                Дешборд
               </Link>
               <Link to="/tasks" className={location.pathname === '/tasks' ? 'active' : ''}>
-                Tasks
+                Задачи
               </Link>
               <Link to="/reports" className={location.pathname === '/reports' ? 'active' : ''}>
-                Reports
+                Отчёты
               </Link>
               {user.role === 'admin' && (
     <>
               <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>
-                  User Management
+                  Настройка пользователей
               </Link>
               <Link to="/backup" className={location.pathname === '/backup' ? 'active' : ''}>
-                  Backup
+                  Бекап
               </Link>
     </>
           )}
-              <button onClick={handleLogout} className="logout-btn">Logout</button>
+              <button onClick={handleLogout} className="logout-btn">Выход</button>
             </>
           ) : (
-            <Link to="/login">Login</Link>
+            <Link to="/login">Вход</Link>
           )}
         </div>
       </div>

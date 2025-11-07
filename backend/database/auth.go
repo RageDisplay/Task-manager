@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var JwtKey = []byte("your-secret-key")
+var JwtKey = make([]byte, 64)
 
 type Claims struct {
 	UserID     int    `json:"user_id"`

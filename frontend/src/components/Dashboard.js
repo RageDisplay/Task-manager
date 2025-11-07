@@ -6,15 +6,15 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1>Dashboard</h1>
-      <p>Welcome, {user?.username}!</p>
+      <h1>Дешборд</h1>
+      <p>Привет, {user?.username}!</p>
       <div className="dashboard">
         <div className="dashboard-card">
-          <h3>Your Role</h3>
+          <h3>Ваша роль</h3>
           <div className="number">{user?.role}</div>
         </div>
         <div className="dashboard-card">
-          <h3>Department</h3>
+          <h3>Отдел</h3>
           <div className="number">{user?.department || 'Not assigned'}</div>
         </div>
       </div>

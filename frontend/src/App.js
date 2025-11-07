@@ -13,7 +13,7 @@ import './App.css';
 function ProtectedRoute({ children, requiredRole }) {
   const { user, loading } = useAuth();
   
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Загрузка...</div>;
   if (!user) return <Navigate to="/login" />;
   if (requiredRole && user.role !== requiredRole && user.role !== 'admin') {
     return <Navigate to="/dashboard" />;

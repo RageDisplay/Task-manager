@@ -26,10 +26,7 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 	if userRole == "admin" {
 		rows, err = h.db.Query("SELECT id, username, role, department, created_at FROM users")
 	} else {
-		rows, err = h.db.Query(
-			"SELECT id, username, role, department, created_at FROM users WHERE department = ?",
-			userDepartment,
-		)
+		rows, err = h.db.Query("SELECT id, username, role, department, created_at FROM users WHERE department = ?", userDepartment)
 	}
 
 	if err != nil {
@@ -88,7 +85,7 @@ func (h *UserHandler) UpdateUserRole(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User role updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Роль пользователя изменена"})
 }
 
 func (h *UserHandler) UpdateUserDepartment(c *gin.Context) {
@@ -112,5 +109,5 @@ func (h *UserHandler) UpdateUserDepartment(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User department updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Инофрмация об отделе обновлена"})
 }

@@ -25,7 +25,7 @@ func main() {
 
 	router := gin.Default()
 
-	// CORS middleware - разрешаем все хосты и методы
+	// Разрешаем все хосты и методы (в идеале ограничить в проде ._.)
 	router.Use(func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")

@@ -38,7 +38,7 @@ func (h *ReportHandler) ExportMyTasks(c *gin.Context) {
 	headers := []string{"Название", "Описание", "Прогресс (%)", "Часов потрачено", "Нагрузка с задачи на месяц (%)", "Создана"}
 	for i, header := range headers {
 		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
-		f.SetCellValue("My Tasks", cell, header)
+		f.SetCellValue("Мои задачи", cell, header)
 	}
 
 	// Данные

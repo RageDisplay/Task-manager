@@ -92,9 +92,7 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 	}
 
 	result, err := h.db.Exec(`
-        INSERT INTO tasks (title, description, progress, hours_per_week, load_per_month, user_id)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `, task.Title, task.Description, task.Progress, task.HoursPerWeek, task.LoadPerMonth, userID)
+        INSERT INTO tasks (title, description, progress, hours_per_week, load_per_month, user_id) VALUES (?, ?, ?, ?, ?, ?)`, task.Title, task.Description, task.Progress, task.HoursPerWeek, task.LoadPerMonth, userID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -127,18 +125,14 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	_, err := h.db.Exec(`
-        UPDATE tasks 
-        SET title = ?, description = ?, progress = ?, hours_per_week = ?, load_per_month = ?, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-    `, task.Title, task.Description, task.Progress, task.HoursPerWeek, task.LoadPerMonth, taskID)
+	_, err := h.db.Exec(`UPDATE tasks SET title = ?, description = ?, progress = ?, hours_per_week = ?, load_per_month = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, task.Title, task.Description, task.Progress, task.HoursPerWeek, task.LoadPerMonth, taskID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Task updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Задача обновлена"})
 }
 
 func (h *TaskHandler) DeleteTask(c *gin.Context) {
@@ -162,5 +156,5 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Задача удалена"})
 }
