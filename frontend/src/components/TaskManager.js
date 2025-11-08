@@ -40,6 +40,8 @@ const TaskManager = () => {
             
             setTasks(prevTasks => [response.data, ...prevTasks]);
             
+            await fetchTasks();
+
             setNewTask({
                 title: '',
                 description: '',
