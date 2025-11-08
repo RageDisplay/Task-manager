@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
 import { useAuth } from '../contexts/AuthContext';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [savingDepartments, setSavingDepartments] = useState({}); // Состояние сохранения по пользователю
-    const [departmentChanges, setDepartmentChanges] = useState({}); // Временные изменения
-    const { user } = useAuth();
+    const [savingDepartments, setSavingDepartments] = useState({});
+    const [departmentChanges, setDepartmentChanges] = useState({});
+    const [deletingUsers, setDeletingUsers] = useState({});
+    const { user: currentUser } = useAuth();
 
     useEffect(() => {
         fetchUsers();
@@ -18,7 +19,6 @@ const UserManagement = () => {
             setLoading(true);
             const response = await api.get('/api/users');
             setUsers(response.data);
-            // Сбрасываем временные изменения при загрузке
             setDepartmentChanges({});
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -35,7 +35,6 @@ const UserManagement = () => {
                 role: newRole 
             });
             
-            // Мгновенно обновляем роль в UI
             setUsers(prevUsers => 
                 prevUsers.map(u => 
                     u.id === userId ? { ...u, role: newRole } : u
@@ -51,7 +50,6 @@ const UserManagement = () => {
     };
 
     const handleDepartmentChange = (userId, newDepartment) => {
-        // Сохраняем временное изменение без отправки на сервер
         setDepartmentChanges(prev => ({
             ...prev,
             [userId]: newDepartment
@@ -73,14 +71,12 @@ const UserManagement = () => {
                 department: newDepartment.trim()
             });
             
-            // Обновляем UI после успешного сохранения
             setUsers(prevUsers => 
                 prevUsers.map(u => 
                     u.id === userId ? { ...u, department: newDepartment.trim() } : u
                 )
             );
             
-            // Убираем временное изменение
             setDepartmentChanges(prev => {
                 const newChanges = { ...prev };
                 delete newChanges[userId];
@@ -96,7 +92,6 @@ const UserManagement = () => {
     };
 
     const cancelDepartmentChange = (userId) => {
-        // Отменяем временное изменение
         setDepartmentChanges(prev => {
             const newChanges = { ...prev };
             delete newChanges[userId];
@@ -104,8 +99,31 @@ const UserManagement = () => {
         });
     };
 
+    const deleteUser = async (userId, username) => {
+        if (!window.confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+            return;
+        }
+
+        try {
+            setDeletingUsers(prev => ({ ...prev, [userId]: true }));
+            
+            const response = await api.delete(`/api/users/${userId}`);
+            
+            alert(response.data.message || `User ${username} deleted successfully`);
+            
+            // Удаляем пользователя из списка
+            setUsers(prevUsers => prevUsers.filter(u => u.id !== userId));
+            
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            const errorMessage = error.response?.data?.error || 'Unknown error';
+            alert('Error deleting user: ' + errorMessage);
+        } finally {
+            setDeletingUsers(prev => ({ ...prev, [userId]: false }));
+        }
+    };
+
     const getCurrentDepartment = (userItem) => {
-        // Возвращаем временное значение если есть, иначе оригинальное
         return departmentChanges[userItem.id] !== undefined 
             ? departmentChanges[userItem.id] 
             : userItem.department || '';
@@ -124,9 +142,14 @@ const UserManagement = () => {
         }
     };
 
+    // Нельзя удалить самого себя
+    const canDeleteUser = (userItem) => {
+        return userItem.id !== currentUser.id;
+    };
+
     return (
         <div>
-            <h2>Настройка пользователей {loading && '(Loading...)'}</h2>
+            <h2>User Management {loading && '(Loading...)'}</h2>
             <div className="users-table">
                 <table>
                     <thead>
@@ -150,12 +173,12 @@ const UserManagement = () => {
                                         onChange={(e) => updateUserRole(userItem.id, e.target.value)}
                                         disabled={loading}
                                     >
-                                        <option value="user">Сотрудник</option>
-                                        <option value="manager">Руководитель</option>
-                                        <option value="admin">Админ</option>
+                                        <option value="user">User</option>
+                                        <option value="manager">Manager</option>
+                                        <option value="admin">Admin</option>
                                     </select>
                                     <span className={`role-badge ${getRoleBadgeClass(userItem.role)}`}>
-                                        {"  "}
+                                        {userItem.role}
                                     </span>
                                 </td>
                                 <td>
@@ -169,49 +192,75 @@ const UserManagement = () => {
                                     />
                                 </td>
                                 <td>
-                                    {hasUnsavedChanges(userItem) && (
-                                        <div style={{ display: 'flex', gap: '5px' }}>
+                                    <div style={{ display: 'flex', gap: '5px', flexDirection: 'column' }}>
+                                        {hasUnsavedChanges(userItem) && (
+                                            <div style={{ display: 'flex', gap: '5px' }}>
+                                                <button 
+                                                    className="btn-save"
+                                                    onClick={() => saveDepartment(userItem.id)}
+                                                    disabled={savingDepartments[userItem.id]}
+                                                    style={{
+                                                        padding: '3px 8px',
+                                                        fontSize: '12px',
+                                                        backgroundColor: '#28a745',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '3px',
+                                                        cursor: savingDepartments[userItem.id] ? 'not-allowed' : 'pointer'
+                                                    }}
+                                                >
+                                                    {savingDepartments[userItem.id] ? 'Saving...' : 'Save'}
+                                                </button>
+                                                <button 
+                                                    className="btn-cancel"
+                                                    onClick={() => cancelDepartmentChange(userItem.id)}
+                                                    disabled={savingDepartments[userItem.id]}
+                                                    style={{
+                                                        padding: '3px 8px',
+                                                        fontSize: '12px',
+                                                        backgroundColor: '#6c757d',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '3px',
+                                                        cursor: savingDepartments[userItem.id] ? 'not-allowed' : 'pointer'
+                                                    }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        )}
+                                        {canDeleteUser(userItem) && (
                                             <button 
-                                                className="btn-save"
-                                                onClick={() => saveDepartment(userItem.id)}
-                                                disabled={savingDepartments[userItem.id]}
+                                                className="btn-delete"
+                                                onClick={() => deleteUser(userItem.id, userItem.username)}
+                                                disabled={deletingUsers[userItem.id]}
                                                 style={{
                                                     padding: '3px 8px',
                                                     fontSize: '12px',
-                                                    backgroundColor: '#28a745',
+                                                    backgroundColor: '#dc3545',
                                                     color: 'white',
                                                     border: 'none',
                                                     borderRadius: '3px',
-                                                    cursor: savingDepartments[userItem.id] ? 'not-allowed' : 'pointer'
+                                                    cursor: deletingUsers[userItem.id] ? 'not-allowed' : 'pointer',
+                                                    marginTop: '5px'
                                                 }}
                                             >
-                                                {savingDepartments[userItem.id] ? 'Saving...' : 'Save'}
+                                                {deletingUsers[userItem.id] ? 'Deleting...' : 'Delete'}
                                             </button>
-                                            <button 
-                                                className="btn-cancel"
-                                                onClick={() => cancelDepartmentChange(userItem.id)}
-                                                disabled={savingDepartments[userItem.id]}
-                                                style={{
-                                                    padding: '3px 8px',
-                                                    fontSize: '12px',
-                                                    backgroundColor: '#6c757d',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '3px',
-                                                    cursor: savingDepartments[userItem.id] ? 'not-allowed' : 'pointer'
-                                                }}
-                                            >
-                                                Отмена
-                                            </button>
-                                        </div>
-                                    )}
+                                        )}
+                                        {!canDeleteUser(userItem) && (
+                                            <span style={{ fontSize: '12px', color: '#6c757d' }}>
+                                                Current user
+                                            </span>
+                                        )}
+                                    </div>
                                 </td>
                                 <td>{new Date(userItem.created_at).toLocaleDateString()}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                {users.length === 0 && !loading && <p>Пользователи не найдены.</p>}
+                {users.length === 0 && !loading && <p>No users found.</p>}
             </div>
         </div>
     );

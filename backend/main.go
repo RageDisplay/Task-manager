@@ -58,6 +58,7 @@ func main() {
 		api.GET("/users", middleware.AdminOnly(), userHandler.GetUsers)
 		api.PUT("/users/:id/role", middleware.AdminOnly(), userHandler.UpdateUserRole)
 		api.PUT("/users/:id/department", middleware.AdminOnly(), userHandler.UpdateUserDepartment)
+		api.DELETE("/users/:id", middleware.AdminOnly(), userHandler.DeleteUser)
 
 		// Отчеты
 		api.GET("/reports/my-tasks", reportHandler.ExportMyTasks)

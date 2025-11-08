@@ -666,3 +666,17 @@ textarea:disabled {
         justify-content: space-between;
     }
 }
+
+.btn-delete {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.btn-delete:hover:not(:disabled) {
+    background-color: #c82333 !important;
+}
+
+/* Подсветка текущего пользователя */
+.users-table tr.current-user {
+    background-color: #e7f3ff !important;
+}
