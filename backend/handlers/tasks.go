@@ -92,7 +92,9 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 	}
 
 	result, err := h.db.Exec(`
-        INSERT INTO tasks (title, description, progress, hours_per_week, load_per_month, user_id) VALUES (?, ?, ?, ?, ?, ?)`, task.Title, task.Description, task.Progress, task.HoursPerWeek, task.LoadPerMonth, userID)
+        INSERT INTO tasks (title, description, progress, hours_per_week, load_per_month, user_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `, task.Title, task.Description, task.Progress, task.HoursPerWeek, task.LoadPerMonth, userID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -125,14 +127,32 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	_, err := h.db.Exec(`UPDATE tasks SET title = ?, description = ?, progress = ?, hours_per_week = ?, load_per_month = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, task.Title, task.Description, task.Progress, task.HoursPerWeek, task.LoadPerMonth, taskID)
+	// Валидация данных
+	if task.Progress < 0 || task.Progress > 100 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Progress must be between 0 and 100"})
+		return
+	}
+	if task.LoadPerMonth < 0 || task.LoadPerMonth > 100 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Load per month must be between 0 and 100"})
+		return
+	}
+	if task.HoursPerWeek < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Hours per week cannot be negative"})
+		return
+	}
+
+	_, err := h.db.Exec(`
+        UPDATE tasks 
+        SET title = ?, description = ?, progress = ?, hours_per_week = ?, load_per_month = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    `, task.Title, task.Description, task.Progress, task.HoursPerWeek, task.LoadPerMonth, taskID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Задача обновлена"})
+	c.JSON(http.StatusOK, gin.H{"message": "Task updated successfully"})
 }
 
 func (h *TaskHandler) DeleteTask(c *gin.Context) {
@@ -156,5 +176,5 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Задача удалена"})
+	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
 }
