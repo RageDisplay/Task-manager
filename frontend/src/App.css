@@ -680,3 +680,17 @@ textarea:disabled {
 .users-table tr.current-user {
     background-color: #e7f3ff !important;
 }
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #3498db;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font: inherit;
+}
+
+.btn-link:hover {
+  color: #2980b9;
+}

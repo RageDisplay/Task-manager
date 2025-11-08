@@ -7,12 +7,23 @@ const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     username: '',
-    password: ''
+    password: '',
+    department: ''
   });
   const [error, setError] = useState('');
 
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Список доступных отделов
+  const departments = [
+    { value: '', label: 'Select Department', disabled: true },
+    { value: 'ОП', label: 'ОП' },
+    { value: 'ОВ', label: 'ОВ' },
+    { value: 'РП', label: 'РП' },
+    { value: 'ГИП', label: 'ГИП' },
+    { value: 'Пресейл', label: 'Пресейл' }
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,13 +38,22 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (error) {
-      setError(error.response?.data?.error || 'Что-то пошло не так.. обратитесь к администратору');
+      setError(error.response?.data?.error || 'Something went wrong');
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      username: '',
+      password: '',
+      department: ''
+    });
+    setError('');
   };
 
   return (
     <div className="login-container">
-      <h2>{isLogin ? 'Логин' : 'Регистрация'}</h2>
+      <h2>{isLogin ? 'Login' : 'Register'}</h2>
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
           <label>Username</label>
@@ -53,20 +73,48 @@ const Login = () => {
             required
           />
         </div>
-        {error && <div className="error" style={{color: 'red'}}>{error}</div>}
+        
+        {/* Поле отдела только для регистрации */}
+        {!isLogin && (
+          <div className="form-group">
+            <label>Department</label>
+            <select
+              value={formData.department}
+              onChange={(e) => setFormData({...formData, department: e.target.value})}
+              required={!isLogin}
+            >
+              {departments.map(dept => (
+                <option 
+                  key={dept.value} 
+                  value={dept.value} 
+                  disabled={dept.disabled}
+                >
+                  {dept.label}
+                </option>
+              ))}
+            </select>
+            <small className="form-help">
+              Please select your department
+            </small>
+          </div>
+        )}
+        
+        {error && <div className="error">{error}</div>}
         <button type="submit" className="btn btn-primary">
-          {isLogin ? 'Логин' : 'Регистрация'}
+          {isLogin ? 'Login' : 'Register'}
         </button>
       </form>
       <p>
-        {isLogin ? "Нет аккаунта? " : "Уже есть аккаунт ? "}
+        {isLogin ? "Don't have an account? " : "Already have an account? "}
         <button 
           type="button" 
           className="btn-link"
-          onClick={() => setIsLogin(!isLogin)}
-          style={{background: 'none', border: 'none', color: '#3498db', cursor: 'pointer'}}
+          onClick={() => {
+            setIsLogin(!isLogin);
+            resetForm();
+          }}
         >
-          {isLogin ? 'Регистрация' : 'Логин'}
+          {isLogin ? 'Register' : 'Login'}
         </button>
       </p>
     </div>
