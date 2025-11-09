@@ -1,4 +1,4 @@
-FROM golang:1.24.1-alpine
+FROM golang:1.24.1-alpine as builder
 
 RUN apk add --no-cache gcc musl-dev sqlite
 
@@ -10,9 +10,17 @@ RUN go mod download
 
 COPY . .
 
-RUN mkdir -p /app/data
+RUN CGO_ENABLED=1 go build -ldflags="-w -s" -o main .
 
-RUN CGO_ENABLED=1 go build -o main .
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates sqlite-libs
+
+WORKDIR /app
+
+COPY --from=builder /app/main .
+
+RUN mkdir -p /app/data
 
 EXPOSE 8080
 
