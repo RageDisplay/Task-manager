@@ -17,12 +17,12 @@ const Login = () => {
 
   // Список доступных отделов
   const departments = [
-    { value: '', label: 'Select Department', disabled: true },
+    { value: '', label: 'Выбор отдела', disabled: true },
     { value: 'ОП', label: 'ОП' },
     { value: 'ОВ', label: 'ОВ' },
     { value: 'РП', label: 'РП' },
     { value: 'ГИП', label: 'ГИП' },
-    { value: 'Пресейл', label: 'Пресейл' }
+    { value: 'ПС', label: 'ПС' }
   ];
 
   const handleSubmit = async (e) => {
@@ -53,10 +53,10 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <h2>{isLogin ? 'Login' : 'Register'}</h2>
+      <h2>{isLogin ? 'Авторизация' : 'Регистрация'}</h2>
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
-          <label>Username</label>
+          <label>Имя пользователя</label>
           <input
             type="text"
             value={formData.username}
@@ -65,7 +65,7 @@ const Login = () => {
           />
         </div>
         <div className="form-group">
-          <label>Password</label>
+          <label>Пароль</label>
           <input
             type="password"
             value={formData.password}
@@ -77,7 +77,7 @@ const Login = () => {
         {/* Поле отдела только для регистрации */}
         {!isLogin && (
           <div className="form-group">
-            <label>Department</label>
+            <label>Отдел</label>
             <select
               value={formData.department}
               onChange={(e) => setFormData({...formData, department: e.target.value})}
@@ -94,18 +94,18 @@ const Login = () => {
               ))}
             </select>
             <small className="form-help">
-              Please select your department
+              Пожалуйста, выберите свой отдел
             </small>
           </div>
         )}
         
         {error && <div className="error">{error}</div>}
         <button type="submit" className="btn btn-primary">
-          {isLogin ? 'Login' : 'Register'}
+          {isLogin ? 'Авторизация' : 'Регистрация'}
         </button>
       </form>
       <p>
-        {isLogin ? "Don't have an account? " : "Already have an account? "}
+        {isLogin ? "Нет аккаунта ? " : "Уже есть аккаунт ? "}
         <button 
           type="button" 
           className="btn-link"
@@ -114,7 +114,7 @@ const Login = () => {
             resetForm();
           }}
         >
-          {isLogin ? 'Register' : 'Login'}
+          {isLogin ? 'Регистрация' : 'Авторизация'}
         </button>
       </p>
     </div>

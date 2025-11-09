@@ -10,12 +10,12 @@ const Dashboard = () => {
       <p>Привет, {user?.username}!</p>
       <div className="dashboard">
         <div className="dashboard-card">
-          <h3>Ваша роль</h3>
+          <h3>Ваша роль в системе</h3>
           <div className="number">{user?.role}</div>
         </div>
         <div className="dashboard-card">
           <h3>Отдел</h3>
-          <div className="number">{user?.department || 'Not assigned'}</div>
+          <div className="number">{user?.department || 'Не установлен'}</div>
         </div>
       </div>
     </div>

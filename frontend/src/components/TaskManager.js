@@ -73,12 +73,12 @@ const TaskManager = () => {
             );
             
         } catch (error) {
-            console.error('Error updating task progress:', error);
-            alert('Error updating task progress: ' + (error.response?.data?.error || error.message));
+            console.error('Ошибка в изменении шкалы прогресса:', error);
+            alert('Ошибка в изменении шкалы прогресса: ' + (error.response?.data?.error || error.message));
         }
     };
 
-    const updateHoursPerWeek = async (taskId, hoursPerWeek) => {
+    /*const updateHoursPerWeek = async (taskId, hoursPerWeek) => {
         try {
             const task = tasks.find(t => t.id === taskId);
             await api.put(`/api/tasks/${taskId}`, {
@@ -116,7 +116,7 @@ const TaskManager = () => {
             console.error('Error updating load per month:', error);
             alert('Error updating load per month: ' + (error.response?.data?.error || error.message));
         }
-    };
+    };*/
 
     const startEditing = (task) => {
         setEditingTask({ ...task });
@@ -140,8 +140,8 @@ const TaskManager = () => {
             
             setEditingTask(null);
         } catch (error) {
-            console.error('Error updating task:', error);
-            alert('Error updating task: ' + (error.response?.data?.error || error.message));
+            console.error('Ошибка в обновлении задачи:', error);
+            alert('Ошибка в обновлении задачи: ' + (error.response?.data?.error || error.message));
         }
     };
 
@@ -153,7 +153,7 @@ const TaskManager = () => {
     };
 
     const deleteTask = async (taskId) => {
-        if (!window.confirm('Are you sure you want to delete this task?')) {
+        if (!window.confirm('Вы уверены в том, что хотите удалить задачу ?')) {
             return;
         }
 
@@ -161,8 +161,8 @@ const TaskManager = () => {
             await api.delete(`/api/tasks/${taskId}`);
             setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
         } catch (error) {
-            console.error('Error deleting task:', error);
-            alert('Error deleting task: ' + (error.response?.data?.error || error.message));
+            console.error('Ошибка в удалении задачи:', error);
+            alert('Ошибка в удалении задачи: ' + (error.response?.data?.error || error.message));
         }
     };
 
@@ -183,23 +183,23 @@ const TaskManager = () => {
             <h2>Task Management</h2>
             
             <form onSubmit={createTask} className="task-form">
-                <h3>Create New Task</h3>
+                <h3>Создать новую задачу</h3>
                 <input
                     type="text"
-                    placeholder="Title"
+                    placeholder="Название задачи"
                     value={newTask.title}
                     onChange={(e) => setNewTask({...newTask, title: e.target.value})}
                     required
                     disabled={loading}
                 />
                 <textarea
-                    placeholder="Description"
+                    placeholder="Описание задачи"
                     value={newTask.description}
                     onChange={(e) => setNewTask({...newTask, description: e.target.value})}
                     disabled={loading}
                 />
                 <div className="form-group">
-                    <label>Progress: {newTask.progress}%</label>
+                    <label>Прогресс: {newTask.progress}%</label>
                     <input
                         type="range"
                         min="0"
@@ -211,7 +211,7 @@ const TaskManager = () => {
                 </div>
                 <div className="form-row">
                     <div className="form-group">
-                        <label>Hours per Week</label>
+                        <label>Часов потрачено</label>
                         <input
                             type="number"
                             step="0.5"
@@ -222,7 +222,7 @@ const TaskManager = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label>Load per Month (%)</label>
+                        <label>Загрузка с задачи на месяц (%)</label>
                         <input
                             type="number"
                             min="0"
@@ -234,15 +234,15 @@ const TaskManager = () => {
                     </div>
                 </div>
                 <button type="submit" disabled={loading}>
-                    {loading ? 'Creating...' : 'Create Task'}
+                    {loading ? 'Создание...' : 'Создать'}
                 </button>
             </form>
 
             <div className="tasks-list">
-                <h3>Tasks {loading && '(Loading...)'}</h3>
+                <h3>Задачи {loading && '(Загрузка...)'}</h3>
                 
                 {tasks.length === 0 && !loading ? (
-                    <p>No tasks found. Create your first task!</p>
+                    <p>Задачи не найдены, создайте первую !</p>
                 ) : (
                     tasks.map(task => (
                         <div key={task.id} className="task-card">
@@ -269,13 +269,13 @@ const TaskManager = () => {
                                                         className="btn-save"
                                                         onClick={() => saveTask(task.id)}
                                                     >
-                                                        Save
+                                                        Сохранить
                                                     </button>
                                                     <button 
                                                         className="btn-cancel"
                                                         onClick={cancelEditing}
                                                     >
-                                                        Cancel
+                                                        Отмена
                                                     </button>
                                                 </>
                                             ) : (
@@ -283,7 +283,7 @@ const TaskManager = () => {
                                                     className="btn-edit"
                                                     onClick={() => startEditing(task)}
                                                 >
-                                                    Edit
+                                                    Изменить
                                                 </button>
                                             )}
                                         </>
@@ -294,7 +294,7 @@ const TaskManager = () => {
                                             onClick={() => deleteTask(task.id)}
                                             disabled={loading}
                                         >
-                                            Delete
+                                            Удалить
                                         </button>
                                     )}
                                 </div>
@@ -311,7 +311,7 @@ const TaskManager = () => {
                             )}
                             
                             <div className="task-progress">
-                                <label>Progress: {task.progress}%</label>
+                                <label>Прогресс: {task.progress}%</label>
                                 <input
                                     type="range"
                                     min="0"
@@ -324,7 +324,7 @@ const TaskManager = () => {
                             
                             <div className="task-stats">
                                 <div className="stat-item">
-                                    <label>Hours/Week: </label>
+                                    <label>Часов потрачено: </label>
                                     {editingTask && editingTask.id === task.id ? (
                                         <input
                                             type="number"
@@ -338,7 +338,7 @@ const TaskManager = () => {
                                         <span 
                                             className="editable-field"
                                             onClick={() => canEditTask(task) && startEditing(task)}
-                                            title={canEditTask(task) ? "Click to edit" : ""}
+                                            title={canEditTask(task) ? "Нажмите для редактирования" : ""}
                                         >
                                             {task.hours_per_week}
                                         </span>
@@ -346,7 +346,7 @@ const TaskManager = () => {
                                 </div>
                                 
                                 <div className="stat-item">
-                                    <label>Monthly Load: </label>
+                                    <label>Нагрузка на месяц: </label>
                                     {editingTask && editingTask.id === task.id ? (
                                         <input
                                             type="number"
@@ -360,7 +360,7 @@ const TaskManager = () => {
                                         <span 
                                             className="editable-field"
                                             onClick={() => canEditTask(task) && startEditing(task)}
-                                            title={canEditTask(task) ? "Click to edit" : ""}
+                                            title={canEditTask(task) ? "Нажмите для редактирования" : ""}
                                         >
                                             {task.load_per_month}%
                                         </span>
@@ -368,7 +368,7 @@ const TaskManager = () => {
                                 </div>
                                 
                                 <div className="stat-item">
-                                    <span>Created: {new Date(task.created_at).toLocaleDateString()}</span>
+                                    <span>Создана: {new Date(task.created_at).toLocaleDateString()}</span>
                                 </div>
                             </div>
                         </div>

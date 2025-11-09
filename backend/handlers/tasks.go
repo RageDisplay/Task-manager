@@ -116,7 +116,7 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		var taskUserID int
 		err := h.db.QueryRow("SELECT user_id FROM tasks WHERE id = ?", taskID).Scan(&taskUserID)
 		if err != nil || taskUserID != userID {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "В доступе отказано"})
 			return
 		}
 	}
@@ -129,15 +129,15 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 
 	// Валидация данных
 	if task.Progress < 0 || task.Progress > 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Progress must be between 0 and 100"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Прогресс может быть в промежутке от 0 до 100"})
 		return
 	}
 	if task.LoadPerMonth < 0 || task.LoadPerMonth > 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Load per month must be between 0 and 100"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Нагрузка может быть в промежутке от 0 до 100"})
 		return
 	}
 	if task.HoursPerWeek < 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Hours per week cannot be negative"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Часы не могут быть отрицательными"})
 		return
 	}
 
@@ -152,7 +152,7 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Task updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Задача успешно обновлена"})
 }
 
 func (h *TaskHandler) DeleteTask(c *gin.Context) {
@@ -165,7 +165,7 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 		var taskUserID int
 		err := h.db.QueryRow("SELECT user_id FROM tasks WHERE id = ?", taskID).Scan(&taskUserID)
 		if err != nil || taskUserID != userID {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "В доступе отказано"})
 			return
 		}
 	}
@@ -176,5 +176,5 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Task deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Задача успешно удалена"})
 }

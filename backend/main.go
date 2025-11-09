@@ -25,7 +25,7 @@ func main() {
 
 	router := gin.Default()
 
-	// Разрешаем все хосты и методы (в идеале ограничить в проде ._.)
+	// Разрешаем все хосты и методы (не забыть потом настроить)
 	router.Use(func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")

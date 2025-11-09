@@ -109,7 +109,7 @@ func (h *UserHandler) UpdateUserDepartment(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Инофрмация об отделе обновлена"})
+	c.JSON(http.StatusOK, gin.H{"message": "Информация об отделе обновлена"})
 }
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {
@@ -122,7 +122,7 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	// Нельзя удалить самого себя
 	currentUserID := c.GetInt("userID")
 	if userID == currentUserID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete your own account"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Нельзя удалить свой аккаунт"})
 		return
 	}
 
@@ -130,7 +130,7 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	var username string
 	err = h.db.QueryRow("SELECT username FROM users WHERE id = ?", userID).Scan(&username)
 	if err == sql.ErrNoRows {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
 		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -147,7 +147,7 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 	if taskCount > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":      "Cannot delete user with existing tasks. Please delete or reassign tasks first.",
+			"error":      "Нельзя удалить пользователя с существующими задачами. Пожалуйста, сначала удалите его задачи.",
 			"task_count": taskCount,
 		})
 		return
@@ -162,12 +162,12 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":      "User deleted successfully",
+		"message":      "Пользователь успешно удалён",
 		"deleted_user": username,
 	})
 }

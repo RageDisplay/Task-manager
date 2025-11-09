@@ -33,14 +33,14 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	var exists bool
 	err := h.db.QueryRow("SELECT 1 FROM users WHERE username = ?", req.Username).Scan(&exists)
 	if err == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Такой пользователь уже существует"})
 		return
 	}
 
 	// Хеширование пароля
 	hashedPassword, err := database.HashPassword(req.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error processing password"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка формата пароля"})
 		return
 	}
 
@@ -59,12 +59,12 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	// Генерация JWT токена
 	token, err := database.GenerateJWT(int(userID), req.Username, "user", req.Department)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка в генерации токена"})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "User created successfully",
+		"message": "Аккаунт успешно создан",
 		"token":   token,
 		"user": gin.H{
 			"id":         userID,
@@ -93,7 +93,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	).Scan(&user.ID, &user.Username, &user.PasswordHash, &user.Role, &department, &user.CreatedAt)
 
 	if err == sql.ErrNoRows {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Неправильные логин или пароль"})
 		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -102,7 +102,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	// Проверка пароля
 	if !database.CheckPasswordHash(req.Password, user.PasswordHash) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Неправильные логин или пароль"})
 		return
 	}
 
@@ -115,7 +115,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	// Генерация JWT токена
 	token, err := database.GenerateJWT(user.ID, user.Username, user.Role, departmentStr)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка в генерации токена"})
 		return
 	}
 
@@ -128,7 +128,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Login successful",
+		"message": "Авторизация успешна",
 		"token":   token,
 		"user":    responseUser,
 	})

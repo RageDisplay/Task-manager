@@ -39,7 +39,6 @@ api.interceptors.response.use(
       window.location.href = '/login';
     }
     
-    // Более детальные ошибки для отладки
     if (error.code === 'ECONNABORTED') {
       console.error('Request timeout:', error);
       throw new Error('Request timeout. Please check your connection.');

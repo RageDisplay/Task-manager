@@ -60,7 +60,7 @@ const UserManagement = () => {
         const newDepartment = departmentChanges[userId];
         
         if (!newDepartment || newDepartment.trim() === '') {
-            alert('Department cannot be empty');
+            alert('Отдел не может быть пустым');
             return;
         }
 
@@ -84,8 +84,8 @@ const UserManagement = () => {
             });
             
         } catch (error) {
-            console.error('Error updating user department:', error);
-            alert('Error updating user department: ' + (error.response?.data?.error || 'Unknown error'));
+            console.error('Ошибка в обновлении отдела:', error);
+            alert('Ошибка в обновлении отдела: ' + (error.response?.data?.error || 'Unknown error'));
         } finally {
             setSavingDepartments(prev => ({ ...prev, [userId]: false }));
         }
@@ -100,7 +100,7 @@ const UserManagement = () => {
     };
 
     const deleteUser = async (userId, username) => {
-        if (!window.confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+        if (!window.confirm(`Вы уверены, что хотите удалить пользователя "${username}"? Это действие нельзя отменить.`)) {
             return;
         }
 
@@ -109,15 +109,15 @@ const UserManagement = () => {
             
             const response = await api.delete(`/api/users/${userId}`);
             
-            alert(response.data.message || `User ${username} deleted successfully`);
+            alert(response.data.message || `Пользователь ${username} успешно удалён`);
             
             // Удаляем пользователя из списка
             setUsers(prevUsers => prevUsers.filter(u => u.id !== userId));
             
         } catch (error) {
-            console.error('Error deleting user:', error);
+            console.error('Ошибка удаления пользователя:', error);
             const errorMessage = error.response?.data?.error || 'Unknown error';
-            alert('Error deleting user: ' + errorMessage);
+            alert('Ошибка удаления пользователя: ' + errorMessage);
         } finally {
             setDeletingUsers(prev => ({ ...prev, [userId]: false }));
         }
@@ -149,7 +149,7 @@ const UserManagement = () => {
 
     return (
         <div>
-            <h2>User Management {loading && '(Loading...)'}</h2>
+            <h2>Настройка пользователей {loading && '(Загрузка...)'}</h2>
             <div className="users-table">
                 <table>
                     <thead>
@@ -173,9 +173,9 @@ const UserManagement = () => {
                                         onChange={(e) => updateUserRole(userItem.id, e.target.value)}
                                         disabled={loading}
                                     >
-                                        <option value="user">User</option>
-                                        <option value="manager">Manager</option>
-                                        <option value="admin">Admin</option>
+                                        <option value="user">Сотрудник</option>
+                                        <option value="manager">Руководитель</option>
+                                        <option value="admin">Админ</option>
                                     </select>
                                     <span className={`role-badge ${getRoleBadgeClass(userItem.role)}`}>
                                         {userItem.role}
@@ -186,7 +186,7 @@ const UserManagement = () => {
                                         type="text"
                                         value={getCurrentDepartment(userItem)}
                                         onChange={(e) => handleDepartmentChange(userItem.id, e.target.value)}
-                                        placeholder="Enter department"
+                                        placeholder="Настройка отдела"
                                         style={{padding: '5px', marginRight: '10px', width: '150px'}}
                                         disabled={loading}
                                     />
@@ -209,7 +209,7 @@ const UserManagement = () => {
                                                         cursor: savingDepartments[userItem.id] ? 'not-allowed' : 'pointer'
                                                     }}
                                                 >
-                                                    {savingDepartments[userItem.id] ? 'Saving...' : 'Save'}
+                                                    {savingDepartments[userItem.id] ? 'Сохранение...' : 'Save'}
                                                 </button>
                                                 <button 
                                                     className="btn-cancel"
@@ -245,7 +245,7 @@ const UserManagement = () => {
                                                     marginTop: '5px'
                                                 }}
                                             >
-                                                {deletingUsers[userItem.id] ? 'Deleting...' : 'Delete'}
+                                                {deletingUsers[userItem.id] ? 'Удаление...' : 'Delete'}
                                             </button>
                                         )}
                                         {!canDeleteUser(userItem) && (
@@ -260,7 +260,7 @@ const UserManagement = () => {
                         ))}
                     </tbody>
                 </table>
-                {users.length === 0 && !loading && <p>No users found.</p>}
+                {users.length === 0 && !loading && <p>Пользователи не найдены.</p>}
             </div>
         </div>
     );
