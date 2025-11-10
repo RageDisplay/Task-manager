@@ -14,9 +14,14 @@ const Navigation = () => {
   return (
     <nav className="navigation">
       <div className="nav-content">
-        <div className="nav-brand">
-          Nexus TM (DEMO)
-        </div>
+        <Link 
+          to="/dashboard" 
+          style={{ textDecoration: 'none', color: 'inherit' }}
+        >
+          <div className="nav-brand">
+            Solar Tasks (DEMO)
+          </div>
+        </Link>
         <div className="nav-links">
           {user ? (
             <>

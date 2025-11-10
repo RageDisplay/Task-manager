@@ -11,6 +11,7 @@ const Login = () => {
     department: ''
   });
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -51,6 +52,10 @@ const Login = () => {
     setError('');
   };
 
+  const togglePasswordVisibility = () => {
+      setShowPassword(!showPassword);
+    };
+
   return (
     <div className="login-container">
       <h2>{isLogin ? 'Авторизация' : 'Регистрация'}</h2>
@@ -66,13 +71,22 @@ const Login = () => {
         </div>
         <div className="form-group">
           <label>Пароль</label>
-          <input
-            type="password"
-            value={formData.password}
-            onChange={(e) => setFormData({...formData, password: e.target.value})}
-            required
-          />
+          <div className="password-input-container">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              required
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? '👁' : '👁'}
+            </button>
         </div>
+      </div>
         
         {/* Поле отдела только для регистрации */}
         {!isLogin && (
